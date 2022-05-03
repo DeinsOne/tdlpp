@@ -14,6 +14,7 @@
 
     #include <plog/Appenders/ColorConsoleAppender.h>
     #include <plog/Appenders/RollingFileAppender.h>
+    #include <plog/Formatters/LogFormatter.h>
 
     #include <plog/Record.h>
     #include <plog/Util.h>
@@ -22,36 +23,6 @@
 
 #if defined(__TDLPP_LOGGING_ENABLE)
 namespace tdlpp { namespace log {
-
-    template<bool useUtcTime>
-    class LogFormatterImpl {
-    public:
-
-        static plog::util::nstring header() {
-            // return PLOG_NSTR("Header\n");
-            return plog::util::nstring();
-        }
-
-        static plog::util::nstring format(const plog::Record& record) {
-            tm t;
-            useUtcTime ? plog::util::gmtime_s(&t, &record.getTime().time) : plog::util::localtime_s(&t, &record.getTime().time);
-
-            plog::util::nostringstream column1;
-            column1 << PLOG_NSTR("[") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_hour << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_min << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_sec << PLOG_NSTR(".") << std::setfill(PLOG_NSTR('0')) << std::setw(3) << static_cast<int>(record.getTime().millitm) << PLOG_NSTR("] ");
-            column1 << PLOG_NSTR("[") << std::left << severityToString(record.getSeverity()) << PLOG_NSTR("] ");
-            column1 << PLOG_NSTR("tid:") << record.getTid();
-
-            plog::util::nostringstream raw;
-            raw << std::setw(33) << std::left << std::setfill(PLOG_NSTR(' ')) << PLOG_NSTR(column1.str()) << PLOG_NSTR(" | ");
-            raw << record.getMessage() << PLOG_NSTR("\n");
-
-            return raw.str();
-        }
-    };
-
-    class LogFormatter : public LogFormatterImpl<false> {};
-    class LogFormatterUtcTime : public LogFormatterImpl<true> {};
-
 
     class Logger {
     public:
@@ -74,32 +45,32 @@ namespace tdlpp { namespace log {
     private:
         Logger() {
             #ifdef TDLPP_ENABLE_CONSOLE_LOGGING
-                consoleAppender = std::make_shared<plog::ColorConsoleAppender<LogFormatter>>();
+                consoleAppender = std::make_shared<plog::ColorConsoleAppender<plog::LogFormatter>>();
                 plog::init<0>((plog::Severity)TDLPP_CONSOLE_LOGGING_LEVEL, consoleAppender.get());
             #endif
 
             #ifdef TDLPP_ENABLE_FILE_LOGGING
-                rollingFileAppender = std::make_shared<plog::RollingFileAppender<LogFormatter>>("tdlpp.log", TDLPP_FILE_LOGGING_MAX_FILE_SIZE, TDLPP_FILE_LOGGING_MAX_FILES);
+                rollingFileAppender = std::make_shared<plog::RollingFileAppender<plog::LogFormatter>>("tdlpp.log", TDLPP_FILE_LOGGING_MAX_FILE_SIZE, TDLPP_FILE_LOGGING_MAX_FILES);
                 plog::init<1>((plog::Severity)TDLPP_FILE_LOGGING_LEVEL, rollingFileAppender.get());
                 // plog::get<0>()->addAppender(rollingFileAppender.get());
             #endif
 
             #ifdef TDLPP_ENABLE_OBJECT_LOGGING
-                objectFileAppender = std::make_shared<plog::RollingFileAppender<LogFormatter>>("objects.log", TDLPP_OBJECT_LOGGING_MAX_FILE_SIZE, TDLPP_OBJECT_LOGGING_MAX_FILES);
+                objectFileAppender = std::make_shared<plog::RollingFileAppender<plog::LogFormatter>>("objects.log", TDLPP_OBJECT_LOGGING_MAX_FILE_SIZE, TDLPP_OBJECT_LOGGING_MAX_FILES);
                 plog::init<2>((plog::Severity)plog::Severity::verbose, objectFileAppender.get());
             #endif
         }
 
         #ifdef TDLPP_ENABLE_CONSOLE_LOGGING
-            std::shared_ptr<plog::ConsoleAppender<LogFormatter>> consoleAppender;
+            std::shared_ptr<plog::ConsoleAppender<plog::LogFormatter>> consoleAppender;
         #endif
 
         #ifdef TDLPP_ENABLE_FILE_LOGGING
-            std::shared_ptr<plog::RollingFileAppender<LogFormatter>> rollingFileAppender;
+            std::shared_ptr<plog::RollingFileAppender<plog::LogFormatter>> rollingFileAppender;
         #endif
 
         #ifdef TDLPP_ENABLE_OBJECT_LOGGING
-            std::shared_ptr<plog::RollingFileAppender<LogFormatter>> objectFileAppender;
+            std::shared_ptr<plog::RollingFileAppender<plog::LogFormatter>> objectFileAppender;
         #endif
     };
 
