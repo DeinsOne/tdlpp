@@ -16,6 +16,9 @@ namespace tdlpp { namespace auth {
         virtual bool IsAuthorized() = 0;
         virtual void WaitAuthorized() = 0;
 
+        virtual bool HandleRetry() = 0;
+        virtual std::uint32_t GetRetriesCount() = 0;
+
     private:
         virtual void OnAuthorized() = 0;
         virtual void OnLogOut() = 0;

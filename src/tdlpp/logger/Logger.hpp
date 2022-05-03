@@ -5,62 +5,6 @@
 #include <memory>
 #include <tdlpp/logger/IdNameBinding.hpp>
 
-// Object logging provides storing incoming responses and outcoming requests of tdlib
-// with rolling file logger to several separated files
-#if defined(TDLPP_ENABLE_OBJECT_LOGGING) || defined(TDLPP_OBJECT_LOGGING_MAX_FILE_SIZE) || defined(TDLPP_OBJECT_LOGGING_MAX_FILES)
-    #ifndef TDLPP_OBJECT_LOGGING_MAX_FILE_SIZE
-        #define TDLPP_OBJECT_LOGGING_MAX_FILE_SIZE 1024 * 1024 * 16
-    #endif
-
-    #ifndef TDLPP_OBJECT_LOGGING_MAX_FILES
-        #define TDLPP_OBJECT_LOGGING_MAX_FILES 1
-    #endif
-
-    #if !defined(TDLPP_ENABLE_OBJECT_LOGGING)
-        #define TDLPP_ENABLE_OBJECT_LOGGING
-    #endif
-#else
-    #define TDLPP_DISABLE_OBJECT_LOGGING
-#endif
-
-// Console logger outputs all allowed information to console using plot ColorConsoleAppender
-// #define TDLPP_ENABLE_CONSOLE_LOGGING
-#if defined(TDLPP_ENABLE_CONSOLE_LOGGING) || defined(TDLPP_CONSOLE_LOGGING_LEVEL)
-    #if !defined(TDLPP_CONSOLE_LOGGING_LEVEL) && defined(TDLPP_LOGGING_LEVEL_COMMON)
-        #define TDLPP_CONSOLE_LOGGING_LEVEL TDLPP_LOGGING_LEVEL_COMMON
-    #elif !defined(TDLPP_CONSOLE_LOGGING_LEVEL)
-        #define TDLPP_CONSOLE_LOGGING_LEVEL 4
-    #endif
-
-    #if !defined(TDLPP_ENABLE_CONSOLE_LOGGING)
-        #define TDLPP_ENABLE_CONSOLE_LOGGING
-    #endif
-#else
-    #define TDLPP_DISABLE_CONSOLE_LOGGING
-#endif
-
-// File logging involves storing of console output with enumerated separated files
-#if defined(TDLPP_ENABLE_FILE_LOGGING) || defined(TDLPP_FILE_LOGGING_LEVEL) || defined(TDLPP_FILE_LOGGING_MAX_FILE_SIZE) || defined(TDLPP_FILE_LOGGING_MAX_FILES)
-    #if !defined(TDLPP_FILE_LOGGING_LEVEL) && defined(TDLPP_LOGGING_LEVEL_COMMON)
-        #define TDLPP_FILE_LOGGING_LEVEL TDLPP_LOGGING_LEVEL_COMMON
-    #elif !defined(TDLPP_FILE_LOGGING_LEVEL)
-        #define TDLPP_FILE_LOGGING_LEVEL 5
-    #endif
-    #if !defined(TDLPP_ENABLE_FILE_LOGGING)
-        #define TDLPP_ENABLE_FILE_LOGGING
-    #endif
-
-    #ifndef TDLPP_FILE_LOGGING_MAX_FILE_SIZE
-        #define TDLPP_FILE_LOGGING_MAX_FILE_SIZE 1024 * 1024 * 32
-    #endif
-
-    #ifndef TDLPP_FILE_LOGGING_MAX_FILES
-        #define TDLPP_FILE_LOGGING_MAX_FILES 1
-    #endif
-#else
-    #define TDLPP_DISABLE_FILE_LOGGING
-#endif
-
 #if defined(TDLPP_ENABLE_OBJECT_LOGGING) || defined(TDLPP_ENABLE_FILE_LOGGING) || defined(TDLPP_ENABLE_CONSOLE_LOGGING)
     #define __TDLPP_LOGGING_ENABLE
 #endif
@@ -85,9 +29,8 @@ namespace tdlpp { namespace log {
     public:
 
         static plog::util::nstring header() {
-            plog::util::nostringstream ss;
-            ss << PLOG_NSTR("\n");
-            return ss.str();
+            // return PLOG_NSTR("Header\n");
+            return plog::util::nstring();
         }
 
         static plog::util::nstring format(const plog::Record& record) {

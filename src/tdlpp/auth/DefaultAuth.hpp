@@ -3,9 +3,9 @@
 #define tdlpp_DefaultAuth
 
 #include <tdlpp/auth/IAuth.hpp>
+#include <condition_variable>
 #include <mutex>
 #include <atomic>
-#include <condition_variable>
 
 namespace tdlpp { namespace auth {
 
@@ -26,9 +26,25 @@ namespace tdlpp { namespace auth {
             TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::WaitAuthorized lock");
             std::mutex _mtx;
             std::unique_lock<std::mutex> lock(_mtx);
-            authLock.wait(lock, [&] { return authorized.load(); });
+            authLock.wait(lock, [&] { return authorized.load() || retries >= TDLPP_MAX_AUTH_RETRIES; });
             TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::WaitAuthorized unlock");
         }
+
+        virtual bool HandleRetry() override {
+            if (retry.load()) {
+                handleUpdate();
+                retry = false;
+                authLock.notify_all();
+                return true;
+            }
+
+            return false;
+        }
+
+        virtual std::uint32_t GetRetriesCount() override {
+            return retries;
+        }
+
 
     private:
         virtual void OnAuthorized() override;
@@ -50,26 +66,14 @@ namespace tdlpp { namespace auth {
 
 
         void handleUpdate();
-        // std::function<void(SharedObjectPtr<td::td_api::Object>)> create_authentication_query_handler() {
-        //     return [this, id = authQueryId](SharedObjectPtr<td::td_api::Object> object) {
-        //         if (id == authQueryId) {
-        //             check_authentication_error(std::move(object));
-        //         }
-        //     };
-        // }
-
-        // void check_authentication_error(SharedObjectPtr<td::td_api::Object> object) {
-        //     if (object->get_id() == td::td_api::error::ID) {
-        //         // auto error = td::move_tl_object_as<td::td_api::error>(object);
-        //         // CRITICAL("Error: {}", to_string(error).c_str());
-        //         // OnAuthorizationStateUpdate( dynamic_cast<td::td_api::updateAuthorizationState&>(authState.get() ) );
-        //         // td::td_api::make_object<td::td_api::updateAuthorizationState>(authState.get());
-        //     }
-        // }
 
     private:
         std::uint64_t authQueryId{0};
-        std::atomic<bool> authorized;
+        std::atomic<bool> authorized{false};
+        
+        std::atomic<bool> retry{false};
+        std::uint32_t retries{0};
+
         SharedObjectPtr<td::td_api::AuthorizationState> authState;
         std::condition_variable authLock;
 

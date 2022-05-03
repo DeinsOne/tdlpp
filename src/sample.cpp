@@ -17,6 +17,10 @@ int main(int argc, char** argv) {
     if (!auth->IsAuthorized())
         auth->WaitAuthorized();
 
+    if (auth->GetRetriesCount() >= TDLPP_MAX_AUTH_RETRIES) {
+        exit(EXIT_FAILURE);
+    }
+
 
     std::string deletedMessagesChatTitle = "Deleted Messages";
 
@@ -27,7 +31,6 @@ int main(int argc, char** argv) {
     std::int64_t deletedMessagesChatId = 0;
     bool chatFound = false;
 
-    // auto a = "[02:49:42.593] [VERB] tid:535352";
 
     while (parsedChatsCount < totalChatsCount && !chatFound) {
         auto chatsPromise = handler->Execute(td::td_api::make_object<td::td_api::getChats>(

@@ -20,17 +20,18 @@ set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
 find_package(Td 1.8.2 REQUIRED)
 
+add_compile_definitions(
+    TDLPP_ENABLE_CONSOLE_LOGGING
+    # PUBLIC -DTDLPP_ENABLE_OBJECT_LOGGING
+    TDLPP_FILE_LOGGING_LEVEL=6
+)
 
 add_library(${CMAKE_PROJECT_NAME}
     src/tdlpp/auth/DefaultAuth.cpp
 )
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC src src/tdlpp/logger)
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC Td::TdStatic)
-target_compile_definitions(${CMAKE_PROJECT_NAME}
-    PUBLIC -DTDLPP_ENABLE_CONSOLE_LOGGING
-    # PUBLIC -DTDLPP_ENABLE_OBJECT_LOGGING
-    PUBLIC -DTDLPP_FILE_LOGGING_LEVEL=6
-)
+
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     CXX_STANDARD 14

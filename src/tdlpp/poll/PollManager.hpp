@@ -22,7 +22,13 @@ namespace tdlpp { namespace poll {
             auto func = [&]() {
                 while (!destroy.load()) {
                     if (IsActive()) {
-                        if (!poll->handler_->auth_->IsAuthorized()) {
+                        if (poll->handler_->auth_->HandleRetry()) {
+                            if (poll->handler_->auth_->GetRetriesCount() >= TDLPP_MAX_AUTH_RETRIES) {
+                                this->Pause();
+                                TDLPP_LOG_FATAL("tdlpp::poll::PollManager poll is paused because you have passed limit of authentication retries(%d)", TDLPP_MAX_AUTH_RETRIES);
+                            }
+                        }
+                        else if (!poll->handler_->auth_->IsAuthorized()) {
                             processResponse(longPoll->router_->Receive(10));
                         }
                         else {
@@ -56,8 +62,14 @@ namespace tdlpp { namespace poll {
             TDLPP_LOG_VERBOSE("tdlpp::poll::PollManager::distructor lock release");
         }
 
-        void Resume() { active = true; }
-        void Pause() { active = false; }
+        void Resume() {
+            TDLPP_LOG_INFO("tdlpp::poll::PollManager::Resume");
+            active = true;
+        }
+        void Pause() {
+            TDLPP_LOG_INFO("tdlpp::poll::PollManager::Pause");
+            active = false;
+        }
         bool IsActive() { return active.load(); }
 
     private:

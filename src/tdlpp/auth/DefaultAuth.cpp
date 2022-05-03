@@ -3,7 +3,7 @@
 #include <tdlpp/base/Handler.hpp>
 #include <td/tl/TlObject.h>
 
-#include <iostream>
+#include <tdlpp/utils.hpp>
 
 void tdlpp::auth::DefaultAuth::handleUpdate() {
     authQueryId++;
@@ -42,7 +42,6 @@ void tdlpp::auth::DefaultAuth::handleUpdate() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthorizationStateUpdate(td::td_api::updateAuthorizationState&& update) {
-    // authQueryId++;
     authState = SharedObjectPtr<td::td_api::AuthorizationState>(std::move(update.authorization_state_).release());
 
     handleUpdate();
@@ -59,10 +58,13 @@ void tdlpp::auth::DefaultAuth::OnLogOut() {
     authorized = false;
     authLock.notify_all();
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateClosed() {
     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateClosed");
     authorized = false;
+    authLock.notify_all();
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
     TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode");
 
@@ -75,13 +77,18 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode %s", err.message_.c_str());
-                    handleUpdate();
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [this](auto&) {}
             ));
         }
     );
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
     TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateRegistration");
 
@@ -97,59 +104,65 @@ void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode %s", err.message_.c_str());
-                    handleUpdate();
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [](auto&) {}
             ));
         }
     );
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
     TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword");
 
-    std::cout << "Enter authentication password: " << std::flush;
-    std::string password;
-    std::getline(std::cin, password);
+    std::string password = utils::getpass("Enter authentication password: ");
 
     handler_->CallAsync(td::td_api::make_object<td::td_api::checkAuthenticationPassword>(password),
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword %s", err.message_.c_str());
-                    handleUpdate();
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [](auto&) {}
             ));
         }
     );
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
     TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber");
 
     std::cout << "Enter phone number: " << std::flush;
     std::string phone_number;
-    std::cin >> phone_number;
+    std::getline(std::cin, phone_number);
+
 
     handler_->CallAsync(td::td_api::make_object<td::td_api::setAuthenticationPhoneNumber>(phone_number, nullptr),
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber %s", err.message_.c_str());
-                    // auto update = td::td_api::make_object<td::td_api::updateAuthorizationState>(authState.get());
-                    // OnAuthorizationStateUpdate(std::move(*update));
-
-                    // auto update = dynamic_cast<td::td_api::updateAuthorizationState*>(authState.get());
-                    // OnAuthorizationStateUpdate(std::move(*update));
-
-                    // handleUpdate();
-
-                    // TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode exit nested callback");
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [](auto&) {}
             ));
         }
     );
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
     TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey");
 
@@ -158,13 +171,18 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey %s", err.message_.c_str());
-                    handleUpdate();
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [](auto&) {}
             ));
         }
     );
 }
+
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
     TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres");
 
@@ -187,14 +205,16 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
         // auth->create_authentication_query_handler()
     // );
 
-    // FIXME: add result validation(td::td_api::ok)
     handler_->CallAsync(td::td_api::make_object<td::td_api::setTdlibParameters>(std::move(parameters)),
-        // create_authentication_query_handler(),
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
                     TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres %s", err.message_.c_str());
-                    handleUpdate();
+                    retry = true;
+                    ++retries;
+                },
+                [this](td::td_api::ok&) {
+                    retries = 0;
                 },
                 [](auto&) {}
             ));
