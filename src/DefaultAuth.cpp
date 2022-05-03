@@ -9,8 +9,16 @@ std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create() {
     return std::make_shared<tdlpp::auth::DefaultAuth>();
 }
 
+std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create(const std::int32_t& apiId_, const std::string& apiHash_) {
+    return std::make_shared<tdlpp::auth::DefaultAuth>(apiId_, apiHash_);
+}
+
 tdlpp::auth::DefaultAuth::DefaultAuth() : authorized(false), authQueryId(0) {
     TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor");
+}
+
+tdlpp::auth::DefaultAuth::DefaultAuth(const std::int32_t& apiId_, const std::string& apiHash_) : apiId(apiId_), apiHash(apiHash_) {
+    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor parametrized");
 }
 
 void tdlpp::auth::DefaultAuth::WaitAuthorized() {
@@ -202,14 +210,17 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
     TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres");
 
-    std::string apiId = utils::getpass("  Enter api id: ");
-    std::string apiHash = utils::getpass("  Enter api hash: ");
+    if (apiId <= 0) {
+        TDLPP_LOG_WARNING("You can genara api id and hash on 'https://my.telegram.org'");
+        apiId = std::stoi(utils::getpass("  Enter api id: "));
+        apiHash = utils::getpass("  Enter api hash: ");
+    }
 
     auto parameters = td::td_api::make_object<td::td_api::tdlibParameters>();
     parameters->database_directory_ = "tdlib";
     parameters->use_message_database_ = true;
     parameters->use_secret_chats_ = false;
-    parameters->api_id_ = std::stoi(apiId);
+    parameters->api_id_ = apiId;
     parameters->api_hash_ = apiHash;
     parameters->system_language_code_ = "en";
     parameters->device_model_ = "desktop";
