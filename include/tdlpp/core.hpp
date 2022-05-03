@@ -68,7 +68,7 @@
 
 #include <memory>
 
-#include <tdlpp/logger/Logger.hpp>
+#include <tdlpp/log/Logger.hpp>
 
 
 namespace tdlpp {
