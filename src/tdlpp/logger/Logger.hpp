@@ -2,7 +2,6 @@
 #ifndef tdlpp_Logger
 #define tdlpp_Logger
 
-#include <memory>
 #include <tdlpp/logger/IdNameBinding.hpp>
 
 #if defined(TDLPP_ENABLE_OBJECT_LOGGING) || defined(TDLPP_ENABLE_FILE_LOGGING) || defined(TDLPP_ENABLE_CONSOLE_LOGGING)

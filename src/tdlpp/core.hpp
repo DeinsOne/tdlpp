@@ -2,8 +2,9 @@
 #ifndef tdlpp_Core_hpp
 #define tdlpp_Core_hpp
 
-
-#define TDLPP_MAX_AUTH_RETRIES 5
+#if !defined(TDLPP_MAX_AUTH_RETRIES)
+    #define TDLPP_MAX_AUTH_RETRIES 5
+#endif
 
 // Object logging provides storing incoming responses and outcoming requests of tdlib
 // with rolling file logger to several separated files
