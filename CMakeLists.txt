@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+
+project(tdlpp LANGUAGES CXX)
+
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(TDLPP_BUILD_SAMPLES "Build tdl++ samples" ON)
+# option(TDLPP_INSTALL "Create installation target for tdl++" ON)
+
+
+include(ExternalProject)
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external)
+
+# ExternalProject_Add(td
+    # GIT_REPOSITORY https://github.com/tdlib/td.git
+    # CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION}
+# )
+
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+
+find_package(Threads REQUIRED)
+find_package(Td 1.8.2 REQUIRED)
+
+
+add_library(${CMAKE_PROJECT_NAME}
+    src/tdlpp/auth/DefaultAuth.cpp
+)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC src src/tdlpp/logger)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC Td::TdStatic)
+target_compile_definitions(${CMAKE_PROJECT_NAME}
+    PUBLIC -DTDLPP_ENABLE_CONSOLE_LOGGING
+    # PUBLIC -DTDLPP_ENABLE_OBJECT_LOGGING
+    PUBLIC -DTDLPP_FILE_LOGGING_LEVEL=6
+)
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 14
+    CXX_EXTENSIONS OFF
+    CXX_STANDARD_REQUIRED ON
+)
+
+
+if (TDLPP_BUILD_SAMPLES)
+    add_executable(${CMAKE_PROJECT_NAME}-sample src/sample.cpp)
+    add_dependencies(${CMAKE_PROJECT_NAME}-sample ${CMAKE_PROJECT_NAME})
+    target_link_libraries(${CMAKE_PROJECT_NAME}-sample PUBLIC ${CMAKE_PROJECT_NAME} Td::TdStatic)
+
+    set_target_properties(${CMAKE_PROJECT_NAME}-sample PROPERTIES
+        CXX_STANDARD 14
+        CXX_EXTENSIONS OFF
+        CXX_STANDARD_REQUIRED ON
+    )
+endif()
+
