@@ -9,11 +9,11 @@
 #endif
 
 #if defined(__TDLPP_LOGGING_ENABLE)
-    #include <tdlpp/logger/plog/Log.h>
-    #include <tdlpp/logger/plog/Init.h>
+    #include <plog/Log.h>
+    #include <plog/Init.h>
 
-    #include <tdlpp/logger/plog/Appenders/ColorConsoleAppender.h>
-    #include <tdlpp/logger/plog/Appenders/RollingFileAppender.h>
+    #include <plog/Appenders/ColorConsoleAppender.h>
+    #include <plog/Appenders/RollingFileAppender.h>
 
     #include <plog/Record.h>
     #include <plog/Util.h>

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(tdlpp LANGUAGES CXX)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(TDLPP_BUILD_SAMPLES "Build tdl++ samples" ON)
+option(TDLPP_BUILD_SAMPLES "Build tdl++ samples" OFF)
 # option(TDLPP_INSTALL "Create installation target for tdl++" ON)
 
 
@@ -22,14 +22,19 @@ find_package(Td 1.8.2 REQUIRED)
 
 add_compile_definitions(
     TDLPP_ENABLE_CONSOLE_LOGGING
-    # PUBLIC -DTDLPP_ENABLE_OBJECT_LOGGING
-    TDLPP_FILE_LOGGING_LEVEL=6
+    TDLPP_ENABLE_OBJECT_LOGGING
+    TDLPP_FILE_LOGGING_LEVEL=5
 )
 
 add_library(${CMAKE_PROJECT_NAME}
-    src/tdlpp/auth/DefaultAuth.cpp
+    src/DefaultAuth.cpp
+    src/Router.cpp
+    src/Poll.cpp
+    src/Handler.cpp
+    src/UpdateCalbacksHandler.cpp
+    src/BindingHandler.cpp
 )
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC src src/tdlpp/logger)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC src include)
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC Td::TdStatic)
 
 
@@ -41,7 +46,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 
 
 if (TDLPP_BUILD_SAMPLES)
-    add_executable(${CMAKE_PROJECT_NAME}-sample src/sample.cpp)
+    add_executable(${CMAKE_PROJECT_NAME}-sample examples/sample.cpp)
     add_dependencies(${CMAKE_PROJECT_NAME}-sample ${CMAKE_PROJECT_NAME})
     target_link_libraries(${CMAKE_PROJECT_NAME}-sample PUBLIC ${CMAKE_PROJECT_NAME} Td::TdStatic)
 

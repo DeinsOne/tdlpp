@@ -12,29 +12,50 @@
 
 namespace tdlpp { namespace base {
 
+    // Update handler processes update with registred callbacks
     class UpdateCallbacksHandler : public TdlppBase {
     public:
-        static std::shared_ptr<UpdateCallbacksHandler> create() {
-            auto handler = std::make_shared<tdlpp::base::UpdateCallbacksHandler>();
-            handler->this_ = handler;
-            return handler;
-        }
+        /**
+         * @brief A factory method
+         * 
+         * @return std::shared_ptr<UpdateCallbacksHandler> New instance of 'UpdateCallbacksHandler'
+         */
+        static std::shared_ptr<UpdateCallbacksHandler> create();
 
     public:
-        UpdateCallbacksHandler() {
-            TDLPP_LOG_VERBOSE("tdlpp::router::UpdateCallbacksHandler::constructor");
-        }
+        UpdateCallbacksHandler();
 
+        /**
+         * @brief Add a callback to the list of callbacks
+         * 
+         * @tparam TdUpdate Inherited from td::td_api::Update
+         * @param func Callback function
+         * @return std::shared_ptr<UpdateCallbacksHandler> Return pointer to this. Provides chaining
+         */
         template<typename TdUpdate>
-        std::shared_ptr<UpdateCallbacksHandler> Listen(const std::function<void(TdUpdate)>& func, const bool& overwrite = false) {
-            if (overwrite) RemoveCallbacks<TdUpdate>();
-
-            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Listen %s overwrite:%d", TDLPP_TD_ID_NAME(TdUpdate::ID), overwrite);
+        std::shared_ptr<UpdateCallbacksHandler> Listen(const std::function<void(TdUpdate)>& func) {
+            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Listen %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
             callbacks[TdUpdate::ID].emplace_back(new std::function<void(TdUpdate)>(func));
             return this_;
         }
 
+        /**
+         * @brief Removing all callbacks for a specific update type
+         * 
+         * @tparam TdUpdate Inherited from td::td_api::Update
+         */
+        template<typename TdUpdate>
+        void RemoveCallbacks() {
+            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::RemoveCallbacks %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
+            callbacks.erase(TdUpdate::ID);
+        }
 
+        /**
+         * @brief Handle update object throught registred callbacks
+         * 
+         * @tparam TdUpdate Inherited from td::td_api::Update
+         * @param objectPtr Object instance to be handled 
+         */
         template<typename TdUpdate>
         void Handle(const SharedObjectPtr<TdUpdate>& objectPtr) {
             TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Handle %s", TDLPP_TD_ID_NAME(objectPtr->get_id()));
@@ -52,13 +73,6 @@ namespace tdlpp { namespace base {
                     }
                 }));
             }
-        }
-
-
-        template<typename TdUpdate>
-        void RemoveCallbacks() {
-            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::RemoveCallbacks %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
-            callbacks.erase(TdUpdate::ID);
         }
 
     private:

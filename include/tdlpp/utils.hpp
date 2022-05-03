@@ -47,7 +47,8 @@ namespace tdlpp { namespace utils {
         return password;
     }
 #elif defined(__linux__)
-    int getch() {
+    // A function that gets a single character from the terminal without echoing it.
+    inline int getch() {
         int ch;
         struct termios t_old, t_new;
         tcgetattr(STDIN_FILENO, &t_old);

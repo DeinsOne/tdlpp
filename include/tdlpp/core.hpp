@@ -80,6 +80,7 @@ namespace tdlpp {
     using SharedObjectPtr = std::shared_ptr<T>;
 
 
+    // A base class for all tdlpp classes
     struct TdlppBase { };
 
     // overloaded
