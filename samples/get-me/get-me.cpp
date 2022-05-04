@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
     auto auth = tdlpp::auth::DefaultAuth::create(
         -1,             // api id
         "",             // api hash
-        "get-me-tdlib"  // downloading dir
+        "sample-shared-tdlib"  // downloading dir
     );
 
     auto handler = tdlpp::base::TdlppHandler::create(auth);
@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
 
 
     std::string tMeLink;
-    std::int32_t profilePhotoId;
     tdlpp::UniqueObjectPtr<td::td_api::profilePhoto> profilePhoto;
 
     // Get telegram user link prefix
@@ -48,7 +47,6 @@ int main(int argc, char** argv) {
             printf("\n  My username: %s\n", me.username_.c_str());
             printf("  Link: %s\n", tMeLink.c_str());
 
-            profilePhotoId = me.profile_photo_->big_->id_;
             profilePhoto = std::move(me.profile_photo_);
         },
         [](td::td_api::error& err) {
@@ -63,7 +61,7 @@ int main(int argc, char** argv) {
 
     // Download profile photo and print path to it. Photo will be downloaded every time program executed
     // To prevent it enable use_message_database_ in td::td_api::tdlibParameters when send params to tdlib
-    auto photoPromise = handler->Execute(td::td_api::make_object<td::td_api::downloadFile>(profilePhotoId, 1, 0, 0, true));
+    auto photoPromise = handler->Execute(td::td_api::make_object<td::td_api::downloadFile>(profilePhoto->big_->id_, 1, 0, 0, true));
 
     td::td_api::downcast_call(*photoPromise->GetResponse(), tdlpp::overloaded(
         [](td::td_api::file& photo) {
