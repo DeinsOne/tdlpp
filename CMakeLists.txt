@@ -46,14 +46,9 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 
 
 if (TDLPP_BUILD_SAMPLES)
-    add_executable(${CMAKE_PROJECT_NAME}-sample examples/sample.cpp)
-    add_dependencies(${CMAKE_PROJECT_NAME}-sample ${CMAKE_PROJECT_NAME})
-    target_link_libraries(${CMAKE_PROJECT_NAME}-sample PUBLIC ${CMAKE_PROJECT_NAME} Td::TdStatic)
+    add_executable(get-me-sample samples/get-me/get-me.cpp)
+    target_link_libraries(get-me-sample PRIVATE ${CMAKE_PROJECT_NAME} PRIVATE Td::TdStatic)
+    add_dependencies(get-me-sample ${CMAKE_PROJECT_NAME})
 
-    set_target_properties(${CMAKE_PROJECT_NAME}-sample PROPERTIES
-        CXX_STANDARD 14
-        CXX_EXTENSIONS OFF
-        CXX_STANDARD_REQUIRED ON
-    )
 endif()
 

@@ -50,7 +50,7 @@ tdlpp::poll::PollManager::PollManager(const std::shared_ptr<tdlpp::poll::LongPol
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        printf("tdlpp::PollManager exit the loop\n");
+        TDLPP_LOG_INFO("tdlpp::PollManager exit the loop");
         destroy = false;
         destroyLock.notify_all();
     };
