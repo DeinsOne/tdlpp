@@ -21,16 +21,34 @@ namespace tdlpp { namespace auth {
          * @brief A factory method
          * @details You can generate api on https://my.telegram.org
          * 
-         * @param apiId_ Api id
-         * @param apiHash_ Api hash
+         * @param tdApiId_ Your Telegram API ID.
+         * @param tdApiHash_ This is the API hash that you get from the Telegram API website.
+         * @param tdDatabaseDir_ The directory where the TDLib database will be stored.
+         * @param deviceModel_ The name of the device model.
+         * @param applicationVersion_ The version of your application.
+         * @param applicationLanguageCode_ The language code of the application.
          * 
-         * @return std::shared_ptr<DefaultAuth> New instance of 'DefaultAuth'
+         * @return A shared pointer to a DefaultAuth object.
          */
-        static std::shared_ptr<DefaultAuth> create(const std::int32_t& apiId_, const std::string& apiHash_);
+        static std::shared_ptr<DefaultAuth> create(
+            const std::int32_t& tdApiId_,
+            const std::string& tdApiHash_,
+            const std::string& tdDatabaseDir_ = "tdlib",
+            const std::string& deviceModel_ = "desktop",
+            const std::string& applicationVersion_ = "1.0",
+            const std::string& applicationLanguageCode_ = "en"
+        );
 
     public:
         DefaultAuth();
-        DefaultAuth(const std::int32_t& apiId_, const std::string& apiHash_);
+        DefaultAuth(
+            const std::int32_t& tdApiId_,
+            const std::string& tdApiHash_,
+            const std::string& tdDatabaseDir_,
+            const std::string& deviceModel_,
+            const std::string& applicationVersion_,
+            const std::string& applicationLanguageCode_
+        );
 
         // Check if the instance is authorized or not
         virtual bool IsAuthorized() override { return authorized.load(); }
@@ -64,8 +82,12 @@ namespace tdlpp { namespace auth {
         std::uint64_t authQueryId{0};
         std::atomic<bool> authorized{false};
 
-        std::int32_t apiId{-1};
-        std::string apiHash;
+        std::int32_t tdApiId{-1};
+        std::string tdApiHash;
+        std::string tdDatabaseDir;
+        std::string deviceModel;
+        std::string applicationVersion;
+        std::string applicationLanguageCode;
 
         std::atomic<bool> retry{false};
         std::uint32_t retries{0};

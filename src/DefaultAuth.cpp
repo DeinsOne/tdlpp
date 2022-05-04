@@ -9,16 +9,34 @@ std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create() {
     return std::make_shared<tdlpp::auth::DefaultAuth>();
 }
 
-std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create(const std::int32_t& apiId_, const std::string& apiHash_) {
-    return std::make_shared<tdlpp::auth::DefaultAuth>(apiId_, apiHash_);
+std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create(
+    const std::int32_t& tdApiId_,
+    const std::string& tdApiHash_,
+    const std::string& tdDatabaseDir_,
+    const std::string& deviceModel_,
+    const std::string& applicationVersion_,
+    const std::string& applicationLanguageCode_
+) {
+    return std::make_shared<tdlpp::auth::DefaultAuth>(tdApiId_, tdApiHash_, tdDatabaseDir_, deviceModel_, applicationVersion_, applicationLanguageCode_);
 }
 
-tdlpp::auth::DefaultAuth::DefaultAuth() : authorized(false), authQueryId(0) {
-    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor");
+tdlpp::auth::DefaultAuth::DefaultAuth()
+ : tdApiId(-1), tdApiHash(""), tdDatabaseDir("tdlib"), deviceModel("desktop"), applicationVersion("1.0"), applicationLanguageCode("en")
+{
+    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor default");
 }
 
-tdlpp::auth::DefaultAuth::DefaultAuth(const std::int32_t& apiId_, const std::string& apiHash_) : apiId(apiId_), apiHash(apiHash_) {
-    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor parametrized");
+tdlpp::auth::DefaultAuth::DefaultAuth(
+    const std::int32_t& tdApiId_,
+    const std::string& tdApiHash_,
+    const std::string& tdDatabaseDir_,
+    const std::string& deviceModel_,
+    const std::string& applicationVersion_,
+    const std::string& applicationLanguageCode_
+) : tdApiId(tdApiId_), tdApiHash(tdApiHash_), tdDatabaseDir(tdDatabaseDir_), deviceModel(deviceModel_), applicationVersion(applicationVersion_),
+    applicationLanguageCode(applicationLanguageCode_)
+{
+    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor parametrized custom");
 }
 
 void tdlpp::auth::DefaultAuth::WaitAuthorized() {
@@ -210,22 +228,19 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
     TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres");
 
-    if (apiId <= 0) {
+    if (tdApiId <= 0) {
         TDLPP_LOG_WARNING("You can genara api id and hash on 'https://my.telegram.org'");
-        apiId = std::stoi(utils::getpass("  Enter api id: "));
-        apiHash = utils::getpass("  Enter api hash: ");
+        tdApiId = std::stoi(utils::getpass("  Enter api id: "));
+        tdApiHash = utils::getpass("  Enter api hash: ");
     }
 
     auto parameters = td::td_api::make_object<td::td_api::tdlibParameters>();
-    parameters->database_directory_ = "tdlib";
-    parameters->use_message_database_ = true;
-    parameters->use_secret_chats_ = false;
-    parameters->api_id_ = apiId;
-    parameters->api_hash_ = apiHash;
-    parameters->system_language_code_ = "en";
-    parameters->device_model_ = "desktop";
-    parameters->application_version_ = "0.1";
-    parameters->enable_storage_optimizer_ = true;
+    parameters->database_directory_ = tdDatabaseDir;
+    parameters->api_id_ = tdApiId;
+    parameters->api_hash_ = tdApiHash;
+    parameters->system_language_code_ = applicationLanguageCode;
+    parameters->device_model_ = deviceModel;
+    parameters->application_version_ = applicationVersion;
 
     handler_->ExecuteAsync(td::td_api::make_object<td::td_api::setTdlibParameters>(std::move(parameters)),
         [this](SharedObjectPtr<td::td_api::Object> object) {
