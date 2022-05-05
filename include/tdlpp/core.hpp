@@ -108,6 +108,20 @@ namespace tdlpp {
         return detail::overload<F...>(f...);
     }
 
+    template<typename TdObject>
+    TdObject cast_object(SharedObjectPtr<td::td_api::Object> object) {
+        TdObject casted;
+
+        td::td_api::downcast_call(*object, overloaded(
+            [&](TdObject& obj) { casted = std::move(obj); },
+            [&](auto&) {
+                TDLPP_LOG_ERROR("Cannot cast object '%s' to '%s'", TDLPP_TD_ID_NAME(object->get_id()), TDLPP_TD_ID_NAME(TdObject::ID));
+                throw std::invalid_argument("tdlpp bad cast_object '" + log::__IdNameBinding(object->get_id()) + "' to '" + log::__IdNameBinding(TdObject::ID) + "'");
+            }
+        ));
+
+        return std::move(casted);
+    }
 } // namespace tdlpp
 
 #endif // tdlpp_Core_hpp
