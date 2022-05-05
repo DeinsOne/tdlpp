@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     std::vector<td::td_api::int53> chatIds;
 
     // Get top 5 chats
-    auto chatsPromise = handler->Execute(td::td_api::make_object<td::td_api::getChats>(td::td_api::make_object<td::td_api::chatListMain>(), 5));
+    auto chatsPromise = handler->Execute<td::td_api::getChats>(td::td_api::make_object<td::td_api::chatListMain>(), 5);
 
     td::td_api::downcast_call(*chatsPromise->GetResponse(), tdlpp::overloaded(
         [&](td::td_api::chats& chats) {
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
     // Print chat titles
     for (int i = 0; i < chatIds.size(); i++) {
-        auto chatPromise = handler->Execute(td::td_api::make_object<td::td_api::getChat>(chatIds[i]));
+        auto chatPromise = handler->Execute<td::td_api::getChat>(chatIds[i]);
 
         td::td_api::downcast_call(*chatPromise->GetResponse(), tdlpp::overloaded(
             [&](td::td_api::chat& chat) {

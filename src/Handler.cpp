@@ -15,9 +15,9 @@ tdlpp::base::TdlppHandler::TdlppHandler(const std::shared_ptr<auth::IAuth>& auth
     if (this_)
         auth_->SetHandler(this_);
 
-    SetCallback<td::td_api::updateAuthorizationState>([&](td::td_api::updateAuthorizationState state) {
+    SetCallback<td::td_api::updateAuthorizationState>(true, [&](td::td_api::updateAuthorizationState state) {
         auth_->OnAuthStateUpdate(std::move(state));
-    }, true);
+    });
 }
 
 void tdlpp::base::TdlppHandler::Handle(const std::uint64_t& requestId, tdlpp::UniqueObjectPtr<td::td_api::Object> object) {

@@ -35,9 +35,12 @@ td::ClientManager::RequestId tdlpp::router::Router::Send(UniqueObjectPtr<td::td_
             TDLPP_LOG_DEBUG("tdlpp::router::Router::Send %s rid:%ld", TDLPP_TD_ID_NAME(casted.get_id()), rid);
             TDLPP_OBJECT_LOG("Send %ld %s", rid, td::td_api::to_string(casted).c_str());
         }));
+
+        clientManager->send(clientId, rid, std::move(function));
+        return rid;
     }
 
-    clientManager->send(clientId, rid, std::move(function));
-    return rid;
+    TDLPP_LOG_FATAL("tdlpp internall error -> tdlpp::router::Router::Send bad object pointer");
+    throw std::invalid_argument("tdlpp internall error -> tdlpp::router::Router::Send bad object pointer");
 }
 
