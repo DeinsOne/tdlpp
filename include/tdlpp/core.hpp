@@ -68,6 +68,7 @@
 
 #include <memory>
 
+#include <stdexcept>
 #include <tdlpp/log/Logger.hpp>
 
 
