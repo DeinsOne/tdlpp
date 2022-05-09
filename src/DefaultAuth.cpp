@@ -40,7 +40,7 @@ tdlpp::auth::DefaultAuth::DefaultAuth(
 }
 
 void tdlpp::auth::DefaultAuth::WaitAuthorized() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::WaitAuthorized lock");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::WaitAuthorized lock");
     std::mutex _mtx;
     std::unique_lock<std::mutex> lock(_mtx);
     authLock.wait(lock, [&] { return authorized.load() || retries >= TDLPP_MAX_AUTH_RETRIES; });
@@ -90,7 +90,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateUpdate(td::td_api::updateAuthorization
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthorized() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthorized");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthorized");
     authorized = true;
     authLock.notify_all();
 }
@@ -108,7 +108,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateClosed() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode");
 
     std::cout << "  Enter authentication code: " << std::flush;
     std::string code;
@@ -132,7 +132,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateRegistration");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateRegistration");
 
     std::string first_name;
     std::string last_name;
@@ -159,7 +159,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword");
 
     std::string password = utils::getpass("  Enter authentication password: ");
 
@@ -181,7 +181,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
-    TDLPP_LOG_INFO("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber");
+    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber");
 
     std::cout << "  Enter phone number: " << std::flush;
     std::string phone_number;
