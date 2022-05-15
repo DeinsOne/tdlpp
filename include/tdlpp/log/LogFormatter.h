@@ -3,19 +3,15 @@
 #include <plog/Util.h>
 #include <iomanip>
 
-namespace plog
-{
+namespace plog {
     template<bool useUtcTime>
-    class LogFormatterImpl
-    {
+    class LogFormatterImpl {
     public:
-        static util::nstring header()
-        {
+        static util::nstring header() {
             return util::nstring();
         }
 
-        static util::nstring format(const Record& record)
-        {
+        static util::nstring format(const Record& record) {
             tm t;
             useUtcTime ? plog::util::gmtime_s(&t, &record.getTime().time) : plog::util::localtime_s(&t, &record.getTime().time);
 

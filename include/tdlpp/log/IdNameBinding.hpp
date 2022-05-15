@@ -837,7 +837,7 @@ static inline std::string __IdNameBinding(const std::int32_t& t_id) {
         case (td::td_api::passportSuitableElement::ID): { return "passportSuitableElement"; }
         case (td::td_api::passwordState::ID): { return "passwordState"; }
         case (td::td_api::paymentForm::ID): { return "paymentForm"; }
-        case (td::td_api::paymentFormTheme::ID): { return "paymentFormTheme"; }
+        // case (td::td_api::paymentFormTheme::ID): { return "paymentFormTheme"; }
         case (td::td_api::paymentReceipt::ID): { return "paymentReceipt"; }
         case (td::td_api::paymentResult::ID): { return "paymentResult"; }
         case (td::td_api::paymentsProviderStripe::ID): { return "paymentsProviderStripe"; }

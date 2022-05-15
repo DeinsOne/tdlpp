@@ -14,7 +14,7 @@
 
     #include <plog/Appenders/ColorConsoleAppender.h>
     #include <plog/Appenders/RollingFileAppender.h>
-    #include <plog/Formatters/LogFormatter.h>
+    #include <tdlpp/log/LogFormatter.h>
 
     #include <plog/Record.h>
     #include <plog/Util.h>
