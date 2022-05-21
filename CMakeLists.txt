@@ -20,6 +20,10 @@ endif()
 project(tdlpp VERSION 0.1.13 LANGUAGES CXX)
 
 option(TDLPP_BUILD_SAMPLES      "Build tdl++ samples" ON)
+option(TDLPP_BUILD_TDLIB        "Build tdlib/td from sources" ON)
+option(TDLPP_BUILD_OPENSSL      "Build openssl from sources" ON)
+option(TDLPP_BUILD_ZLIB         "Build zlib from sources" ON)
+option(TDLPP_BUILD_GPERF        "Build gperf from sources" ON)
 
 ##################################################################################################################
 ## Set up build threads
@@ -58,6 +62,10 @@ execute_process(COMMAND
     -G ${CMAKE_GENERATOR}
     -S ${CMAKE_CURRENT_LIST_DIR}/external
     -B ${TDLPP_DEPS_BUILD_PATH}
+      -DTDLPP_BUILD_TDLIB=${TDLPP_BUILD_TDLIB}
+      -DTDLPP_BUILD_OPENSSL=${TDLPP_BUILD_OPENSSL}
+      -DTDLPP_BUILD_ZLIB=${TDLPP_BUILD_ZLIB}
+      -DTDLPP_BUILD_GPERF=${TDLPP_BUILD_GPERF}
       -DTDLPP_DEPS_SOURCE_PATH=${TDLPP_DEPS_SOURCE_PATH}
       -DTDLPP_DEPS_BUILD_PATH=${TDLPP_DEPS_BUILD_PATH}
       -DTDLPP_DEPS_INSTALL_PATH=${TDLPP_DEPS_INSTALL_PATH}
@@ -73,8 +81,12 @@ execute_process(COMMAND
 ###################################################################################################
 ## Tdlpp
 
-set(Td_DIR ${TDLPP_DEPS_INSTALL_PATH}/td/lib/cmake/Td)
-find_package(Td CONFIG REQUIRED NO_DEFAULT_PATH)
+if (TDLPP_BUILD_TDLIB)
+  set(Td_DIR ${TDLPP_DEPS_INSTALL_PATH}/td/lib/cmake/Td)
+  find_package(Td CONFIG REQUIRED NO_DEFAULT_PATH)
+else()
+  find_package(Td REQUIRED)
+endif()
 
 
 set(TDLPP_SOURCES

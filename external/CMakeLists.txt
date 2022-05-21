@@ -21,39 +21,51 @@ include(install-module.cmake)
 
 ##################################################################################################################
 
-build_subproject(
-  NAME openssl
-  URL "https://github.com/janbar/openssl-cmake.git"
-  TAG d4634362820f874e1f1461c7f5d766b3ef968c67
-  BUILD_ARGS
-    -DWITH_APPS=OFF
-    -DBUILD_SHARED_LIBS=ON
-)
+set(TDLPP_TD_DEFINES)
 
-set(OPENSSL_ROOT_DIR ${TDLPP_DEPS_INSTALL_PATH}/openssl CACHE STRING "OpenSSL root directory")
+if (TDLPP_BUILD_OPENSSL)
+  build_subproject(
+    NAME openssl
+    URL "https://github.com/janbar/openssl-cmake.git"
+    TAG d4634362820f874e1f1461c7f5d766b3ef968c67
+    BUILD_ARGS
+      -DWITH_APPS=OFF
+      -DBUILD_SHARED_LIBS=ON
+  )
 
-##################################################################################################################
-
-build_subproject(
-  NAME zlib
-  URL "https://github.com/madler/zlib.git"
-  TAG cacf7f1d4e3d44d871b605da3b647f07d718623f
-)
-
-set(ZLIB_ROOT ${TDLPP_DEPS_INSTALL_PATH}/zlib CACHE STRING "Zlib root directory")
+  set(OPENSSL_ROOT_DIR ${TDLPP_DEPS_INSTALL_PATH}/openssl CACHE STRING "OpenSSL root directory")
+  list(APPEND TDLPP_TD_DEFINES -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR})
+endif()
 
 ##################################################################################################################
 
-build_subproject(
-  NAME gperf
-  URL "https://github.com/jwinarske/gperf.git"
-  TAG 49da03c6ff2515be730bf39cb989379793b6dd6e
-)
+if (TDLPP_BUILD_ZLIB)
+  build_subproject(
+    NAME zlib
+    URL "https://github.com/madler/zlib.git"
+    TAG cacf7f1d4e3d44d871b605da3b647f07d718623f
+  )
 
-if (WIN32)
-  set(GPERF_EXECUTABLE ${TDLPP_DEPS_INSTALL_PATH}/gperf/bin/gperf.exe CACHE STRING "Gperf executable")
-else()
-  set(GPERF_EXECUTABLE ${TDLPP_DEPS_INSTALL_PATH}/gperf/bin/gperf CACHE STRING "Gperf executable")
+  set(ZLIB_ROOT ${TDLPP_DEPS_INSTALL_PATH}/zlib CACHE STRING "Zlib root directory")
+  list(APPEND TDLPP_TD_DEFINES -DZLIB_ROOT=${ZLIB_ROOT})
+endif()
+
+##################################################################################################################
+
+if (TDLPP_BUILD_GPERF AND TDLPP_BUILD_TDLIB)
+  build_subproject(
+    NAME gperf
+    URL "https://github.com/jwinarske/gperf.git"
+    TAG 49da03c6ff2515be730bf39cb989379793b6dd6e
+  )
+
+  if (WIN32)
+    set(GPERF_EXECUTABLE ${TDLPP_DEPS_INSTALL_PATH}/gperf/bin/gperf.exe CACHE STRING "Gperf executable")
+  else()
+    set(GPERF_EXECUTABLE ${TDLPP_DEPS_INSTALL_PATH}/gperf/bin/gperf CACHE STRING "Gperf executable")
+  endif()
+
+  list(APPEND TDLPP_TD_DEFINES -DGPERF_EXECUTABLE=${GPERF_EXECUTABLE})
 endif()
 
 ##################################################################################################################
@@ -68,14 +80,12 @@ build_subproject(
 
 ##################################################################################################################
 
-build_subproject(
-  NAME td
-  URL "https://github.com/tdlib/td.git"
-  TAG origin/master
-  BUILD_ARGS
-    -DGPERF_EXECUTABLE=${GPERF_EXECUTABLE}
-    -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
-    -DZLIB_ROOT=${ZLIB_ROOT}
-  DEPENDS_ON openssl zlib gperf
-)
-
+if (TDLPP_BUILD_TDLIB)
+  build_subproject(
+    NAME td
+    URL "https://github.com/tdlib/td.git"
+    TAG origin/master
+    BUILD_ARGS ${TDLPP_TD_DEFINES}
+    DEPENDS_ON openssl zlib gperf
+  )
+endif()
