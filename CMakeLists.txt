@@ -92,8 +92,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC Td::TdStatic)
 
 if (MSVC)
   target_compile_definitions(${PROJECT_NAME} PRIVATE /bigobj)
-else ()
-  target_compile_definitions(${PROJECT_NAME} PRIVATE -Wa,-mbig-obj)
+# else ()
+  # target_compile_options(${PROJECT_NAME} PRIVATE -Wa,-mbig-obj)
 endif ()
 
 ###################################################################################################
