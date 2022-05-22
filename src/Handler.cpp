@@ -21,7 +21,7 @@ tdlpp::base::TdlppHandler::TdlppHandler(const std::shared_ptr<auth::IAuth>& auth
 }
 
 void tdlpp::base::TdlppHandler::Handle(const std::uint64_t& requestId, tdlpp::UniqueObjectPtr<td::td_api::Object> object) {
-    TDLPP_LOG_DEBUG("tdlpp::base::TdlppHandler::Handle %s rid:%ld", TDLPP_TD_ID_NAME(object->get_id()), requestId);
+    TDLPP_LOG_DEBUG("rid:%ld %s", requestId, TDLPP_TD_ID_NAME(object->get_id()));
 
     std::shared_ptr<td::td_api::Object> objectPtr(std::move(object).release());
 

@@ -56,12 +56,12 @@ namespace tdlpp { namespace base {
 
     public:
         ResponsePromise(const std::uint64_t& requestId) : rid(requestId) {
-            TDLPP_LOG_VERBOSE("tdlpp::router::ResponsePromise::constructor");
+            TDLPP_LOG_VERBOSE("constructor");
         }
         ResponsePromise(const std::uint64_t& requestId, const std::function<void(SharedObjectPtr<td::td_api::Object>)>& callback_)
             : rid(requestId), callback(callback_) 
         {
-            TDLPP_LOG_VERBOSE("tdlpp::router::ResponsePromise::constructor");
+            TDLPP_LOG_VERBOSE("constructor");
         }
 
         // Retruns associated request id
@@ -73,21 +73,21 @@ namespace tdlpp { namespace base {
         // Waiting for response to be set. Locks executing thread
         virtual std::shared_ptr<td::td_api::Object> GetResponse() override {
             if (response) return response;
-            TDLPP_LOG_DEBUG("tdlpp::base::ResponsePromise::GetResponse rid:%ld lock, wait response", rid);
+            TDLPP_LOG_DEBUG("rid:%ld lock, wait response", rid);
             std::mutex _mtx;
             std::unique_lock<std::mutex> ulock(_mtx);
             lock.wait(ulock, [&] { return response != nullptr; });
-            TDLPP_LOG_DEBUG("tdlpp::base::ResponsePromise::GetResponse rid:%ld unlock", rid);
+            TDLPP_LOG_DEBUG("rid:%ld unlock", rid);
             return response;
         }
 
     private:
         // Setting the response and notifying the waiting thread.
         virtual void SetResponse(SharedObjectPtr<td::td_api::Object> response_) override {
-            TDLPP_LOG_DEBUG("tdlpp::base::ResponsePromise::GetResponse %s rid:%ld", TDLPP_TD_ID_NAME(response_->get_id()), rid);
+            TDLPP_LOG_DEBUG("rid:%ld %s", rid, TDLPP_TD_ID_NAME(response_->get_id()));
             response = response_;
             if (callback) {
-                TDLPP_LOG_DEBUG("tdlpp::base::ResponsePromise::GetResponse %s trigger callback rid:%ld", TDLPP_TD_ID_NAME(response_->get_id()), rid);
+                TDLPP_LOG_DEBUG("%s trigger callback rid:%ld", TDLPP_TD_ID_NAME(response_->get_id()), rid);
                 callback(response);
             }
             lock.notify_all();

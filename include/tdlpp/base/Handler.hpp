@@ -41,7 +41,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdUpdate>
         std::shared_ptr<TdlppHandler> SetCallback(const bool& overwrite, const std::function<void(TdUpdate)>& func) {
-            TDLPP_LOG_DEBUG("tdlpp::base::TdlppHandler::SetCallback %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
+            TDLPP_LOG_DEBUG("%s", TDLPP_TD_ID_NAME(TdUpdate::ID));
             if (overwrite) updatesHandler->RemoveCallbacks<TdUpdate>();
             updatesHandler->Listen<TdUpdate>(func);
             return this_;
@@ -56,7 +56,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdFunction, typename... TArgs>
         std::shared_ptr<IResponsePromise> Execute(TArgs... args) {
-            TDLPP_LOG_DEBUG("tdlpp::base::TdlppHandler::Execute %s rid:%ld", TDLPP_TD_ID_NAME(TdFunction::ID), router_->GetLastRequestId() + 1);
+            TDLPP_LOG_DEBUG("rid:%ld %s", router_->GetLastRequestId() + 1, TDLPP_TD_ID_NAME(TdFunction::ID));
             auto rid = router_->Send(td::td_api::make_object<TdFunction>(std::move(args)...));
             auto promise = ResponsePromise<TdFunction>::create(rid);
             binding->Listen(promise);
@@ -72,7 +72,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdFunction>
         void ExecuteAsync(UniqueObjectPtr<TdFunction> function, const std::function<void(SharedObjectPtr<td::td_api::Object>)>& handler = {} ) {
-            TDLPP_LOG_DEBUG("tdlpp::base::TdlppHandler::ExecuteAsync %s rid:%ld", TDLPP_TD_ID_NAME(TdFunction::ID), router_->GetLastRequestId() + 1);
+            TDLPP_LOG_DEBUG("rid:%ld %s", router_->GetLastRequestId() + 1, TDLPP_TD_ID_NAME(TdFunction::ID));
             auto rid = router_->Send(std::move(function));
             binding->Listen(ResponsePromise<TdFunction>::create(rid, handler));
         }

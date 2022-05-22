@@ -35,7 +35,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdFunction>
         void Listen(const std::shared_ptr<ResponsePromise<TdFunction>>& promise) {
-            TDLPP_LOG_DEBUG("tdlpp::base::BindingHandler::Listen %s rid:%ld", TDLPP_TD_ID_NAME(TdFunction::ID), promise->GetRID());
+            TDLPP_LOG_DEBUG("rid:%ld %s", promise->GetRID(), TDLPP_TD_ID_NAME(TdFunction::ID));
             std::lock_guard<std::mutex> _lock(promisesLock);
             promises[promise->GetRID()] = promise;
         }

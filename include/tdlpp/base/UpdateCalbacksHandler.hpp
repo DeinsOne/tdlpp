@@ -34,7 +34,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdUpdate>
         std::shared_ptr<UpdateCallbacksHandler> Listen(const std::function<void(TdUpdate)>& func) {
-            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Listen %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
+            TDLPP_LOG_DEBUG("%s", TDLPP_TD_ID_NAME(TdUpdate::ID));
             callbacks[TdUpdate::ID].emplace_back(new std::function<void(TdUpdate)>(func));
             return this_;
         }
@@ -46,7 +46,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdUpdate>
         void RemoveCallbacks() {
-            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::RemoveCallbacks %s", TDLPP_TD_ID_NAME(TdUpdate::ID));
+            TDLPP_LOG_DEBUG("%s", TDLPP_TD_ID_NAME(TdUpdate::ID));
             callbacks.erase(TdUpdate::ID);
         }
 
@@ -58,7 +58,7 @@ namespace tdlpp { namespace base {
          */
         template<typename TdUpdate>
         void Handle(const SharedObjectPtr<TdUpdate>& objectPtr) {
-            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Handle %s", TDLPP_TD_ID_NAME(objectPtr->get_id()));
+            TDLPP_LOG_DEBUG("%s", TDLPP_TD_ID_NAME(objectPtr->get_id()));
 
             auto current = callbacks.find(objectPtr->get_id());
 
@@ -67,7 +67,7 @@ namespace tdlpp { namespace base {
                     for (int i = 0; i < current->second.size(); i++) {
                         auto callback = reinterpret_cast<std::function<void(decltype(casted))>*>(current->second.at(i));
                         if (callback) {
-                            TDLPP_LOG_DEBUG("tdlpp::base::UpdateCallbacksHandler::Handle callback[%d]", i);
+                            TDLPP_LOG_DEBUG("callback[%d]", i);
                             callback->operator()(casted);
                         }
                     }

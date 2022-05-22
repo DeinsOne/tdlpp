@@ -23,7 +23,7 @@ std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create(
 tdlpp::auth::DefaultAuth::DefaultAuth()
  : tdApiId(-1), tdApiHash(""), tdDatabaseDir("tdlib"), deviceModel("desktop"), applicationVersion("1.0"), applicationLanguageCode("en")
 {
-    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor default");
+    TDLPP_LOG_VERBOSE("constructor default");
 }
 
 tdlpp::auth::DefaultAuth::DefaultAuth(
@@ -36,20 +36,20 @@ tdlpp::auth::DefaultAuth::DefaultAuth(
 ) : tdApiId(tdApiId_), tdApiHash(tdApiHash_), tdDatabaseDir(tdDatabaseDir_), deviceModel(deviceModel_), applicationVersion(applicationVersion_),
     applicationLanguageCode(applicationLanguageCode_)
 {
-    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::constructor parametrized custom");
+    TDLPP_LOG_VERBOSE("constructor parametrized custom");
 }
 
 void tdlpp::auth::DefaultAuth::WaitAuthorized() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::WaitAuthorized lock");
+    TDLPP_LOG_DEBUG("lock");
     std::mutex _mtx;
     std::unique_lock<std::mutex> lock(_mtx);
     authLock.wait(lock, [&] { return authorized.load() || retries >= TDLPP_MAX_AUTH_RETRIES; });
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::WaitAuthorized unlock");
+    TDLPP_LOG_DEBUG("unlock");
 }
 
 void tdlpp::auth::DefaultAuth::handleUpdate() {
     authQueryId++;
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateUpdate %s", TDLPP_TD_ID_NAME(authState->get_id()));
+    TDLPP_LOG_DEBUG("%s", TDLPP_TD_ID_NAME(authState->get_id()));
 
     td::td_api::downcast_call(*authState, overloaded(
         [this](td::td_api::authorizationStateWaitTdlibParameters& object) {
@@ -90,25 +90,25 @@ void tdlpp::auth::DefaultAuth::OnAuthStateUpdate(td::td_api::updateAuthorization
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthorized() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthorized");
+    TDLPP_LOG_DEBUG(" ");
     authorized = true;
     authLock.notify_all();
 }
 
 void tdlpp::auth::DefaultAuth::OnLogOut() {
-    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnLogOut");
+    TDLPP_LOG_ERROR(" ");
     authorized = false;
     authLock.notify_all();
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateClosed() {
-    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateClosed");
+    TDLPP_LOG_ERROR(" ");
     authorized = false;
     authLock.notify_all();
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode");
+    TDLPP_LOG_DEBUG(" ");
 
     std::cout << "  Enter authentication code: " << std::flush;
     std::string code;
@@ -118,7 +118,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -132,7 +132,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitCode() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateRegistration");
+    TDLPP_LOG_DEBUG(" ");
 
     std::string first_name;
     std::string last_name;
@@ -145,7 +145,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitCode %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -159,7 +159,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateRegistration() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword");
+    TDLPP_LOG_DEBUG(" ");
 
     std::string password = utils::getpass("  Enter authentication password: ");
 
@@ -167,7 +167,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -181,7 +181,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber");
+    TDLPP_LOG_DEBUG(" ");
 
     std::cout << "  Enter phone number: " << std::flush;
     std::string phone_number;
@@ -192,7 +192,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -206,13 +206,13 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey");
+    TDLPP_LOG_DEBUG(" ");
 
     handler_->ExecuteAsync(td::td_api::make_object<td::td_api::checkDatabaseEncryptionKey>(""),
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -226,7 +226,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitEncryptionKey() {
 }
 
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
-    TDLPP_LOG_DEBUG("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres");
+    TDLPP_LOG_DEBUG(" ");
 
     if (tdApiId <= 0) {
         TDLPP_LOG_WARNING("You can genara api id and hash on 'https://my.telegram.org'");
@@ -246,7 +246,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
         [this](SharedObjectPtr<td::td_api::Object> object) {
             td::td_api::downcast_call(*object, overloaded(
                 [this](td::td_api::error& err) {
-                    TDLPP_LOG_ERROR("tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres %s", err.message_.c_str());
+                    TDLPP_LOG_ERROR("%s", err.message_.c_str());
                     retry = true;
                     ++retries;
                 },
@@ -261,7 +261,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
 
 
 void tdlpp::auth::DefaultAuth::SetHandler(const std::shared_ptr<tdlpp::base::TdlppHandler>& handler) {
-    TDLPP_LOG_VERBOSE("tdlpp::auth::DefaultAuth::SetHandler");
+    TDLPP_LOG_VERBOSE(" ");
     handler_ = handler;
 }
 
