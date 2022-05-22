@@ -44,6 +44,7 @@ namespace tdlpp { namespace utils {
             }
         }
         std::cout << std::endl;
+        SetConsoleMode(hIn, con_mode | ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
         return password;
     }
 #elif defined(__linux__)

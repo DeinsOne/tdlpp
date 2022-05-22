@@ -183,7 +183,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitPassword() {
 void tdlpp::auth::DefaultAuth::OnAuthStateWaitPhoneNumber() {
     TDLPP_LOG_DEBUG(" ");
 
-    std::cout << "  Enter phone number: " << std::flush;
+    std::cout << "  Enter phone number: ";
     std::string phone_number;
     std::getline(std::cin, phone_number);
 
