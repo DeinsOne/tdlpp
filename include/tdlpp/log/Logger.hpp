@@ -32,9 +32,9 @@ namespace tdlpp { namespace log {
         }
 
         template<typename... TArgs>
-        void AddLog(const plog::Severity& level, TArgs... args) {
-            PLOG_(0, level).printf(args...);
-            PLOG_(1, level).printf(args...);
+        void AddLog(const plog::Severity& level, const std::string& func, const std::size_t& line, const std::string& file, TArgs... args) {
+            IF_PLOG_(0, level) (*plog::get<0>()) += plog::Record(level, func.c_str(), line, file.c_str(), PLOG_GET_THIS(), 0).ref().printf(args...);
+            IF_PLOG_(1, level) (*plog::get<1>()) += plog::Record(level, func.c_str(), line, file.c_str(), PLOG_GET_THIS(), 1).ref().printf(args...);
         }
 
         template<typename... TArgs>
@@ -92,13 +92,13 @@ namespace tdlpp { namespace log {
 
     #define TDLPP_OBJECT_LOG(...)
 #else
-    #define TDLPP_LOG_VERBOSE(...)      tdlpp::log::Logger::Get()->AddLog(plog::verbose, __VA_ARGS__)
-    #define TDLPP_LOG_DEBUG(...)        tdlpp::log::Logger::Get()->AddLog(plog::debug, __VA_ARGS__)
-    #define TDLPP_LOG_INFO(...)         tdlpp::log::Logger::Get()->AddLog(plog::info, __VA_ARGS__)
-    #define TDLPP_LOG_WARNING(...)      tdlpp::log::Logger::Get()->AddLog(plog::warning, __VA_ARGS__)
-    #define TDLPP_LOG_ERROR(...)        tdlpp::log::Logger::Get()->AddLog(plog::error, __VA_ARGS__)
-    #define TDLPP_LOG_FATAL(...)        tdlpp::log::Logger::Get()->AddLog(plog::fatal, __VA_ARGS__)
-    #define TDLPP_LOG_NONE(...)         tdlpp::log::Logger::Get()->AddLog(plog::none, __VA_ARGS__)
+    #define TDLPP_LOG_VERBOSE(...)      tdlpp::log::Logger::Get()->AddLog(plog::verbose, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_DEBUG(...)        tdlpp::log::Logger::Get()->AddLog(plog::debug, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_INFO(...)         tdlpp::log::Logger::Get()->AddLog(plog::info, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_WARNING(...)      tdlpp::log::Logger::Get()->AddLog(plog::warning, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_ERROR(...)        tdlpp::log::Logger::Get()->AddLog(plog::error, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_FATAL(...)        tdlpp::log::Logger::Get()->AddLog(plog::fatal, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
+    #define TDLPP_LOG_NONE(...)         tdlpp::log::Logger::Get()->AddLog(plog::none, PLOG_GET_FUNC(), __LINE__, PLOG_GET_FILE(), __VA_ARGS__)
 
     #define TDLPP_OBJECT_LOG(...)       tdlpp::log::Logger::Get()->AddObjectLog(__VA_ARGS__)
 #endif // __TDLPP_LOGGING_ENABLE

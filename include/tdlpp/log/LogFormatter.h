@@ -22,6 +22,7 @@ namespace plog {
 
             plog::util::nostringstream raw;
             raw << std::setw(33) << std::left << std::setfill(PLOG_NSTR(' ')) << PLOG_NSTR(column1.str()) << PLOG_NSTR(" | ");
+            raw << PLOG_NSTR("[") << record.getFunc() << PLOG_NSTR("@") << record.getLine() << PLOG_NSTR("] ");
             raw << record.getMessage() << PLOG_NSTR("\n");
 
             return raw.str();
