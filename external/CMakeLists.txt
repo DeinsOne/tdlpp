@@ -23,7 +23,7 @@ include(install-module.cmake)
 
 set(TDLPP_TD_DEFINES)
 
-if (TDLPP_BUILD_OPENSSL)
+if (TDLPP_BUILD_OPENSSL AND TDLPP_BUILD_TDLIB)
   build_subproject(
     NAME openssl
     URL "https://github.com/janbar/openssl-cmake.git"
@@ -39,7 +39,7 @@ endif()
 
 ##################################################################################################################
 
-if (TDLPP_BUILD_ZLIB)
+if (TDLPP_BUILD_ZLIB AND TDLPP_BUILD_TDLIB)
   build_subproject(
     NAME zlib
     URL "https://github.com/madler/zlib.git"
