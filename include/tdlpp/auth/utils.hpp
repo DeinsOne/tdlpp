@@ -23,7 +23,7 @@ namespace tdlpp { namespace utils {
         const char RETURN = 13;
         std::string password;
         unsigned char ch = 0;
-        std::cout << prompt << std::endl;
+        std::cout << prompt;
         DWORD con_mode;
         DWORD dwRead;
         HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
