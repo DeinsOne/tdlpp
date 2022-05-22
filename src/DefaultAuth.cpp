@@ -3,7 +3,7 @@
 #include <tdlpp/base/Handler.hpp>
 #include <td/tl/TlObject.h>
 
-#include <tdlpp/log/utils.hpp>
+#include <tdlpp/auth/utils.hpp>
 
 std::shared_ptr<tdlpp::auth::DefaultAuth> tdlpp::auth::DefaultAuth::create() {
     return std::make_shared<tdlpp::auth::DefaultAuth>();
