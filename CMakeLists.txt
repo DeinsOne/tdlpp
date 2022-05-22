@@ -102,6 +102,8 @@ add_library(${PROJECT_NAME} SHARED ${TDLPP_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC include PUBLIC ${TDLPP_DEPS_INSTALL_PATH}/plog/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Td::TdStatic)
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DTDLPP_ENABLE_CONSOLE_LOGGING)
+
 if (MSVC)
   target_compile_definitions(${PROJECT_NAME} PRIVATE /bigobj)
 # else ()

@@ -25,12 +25,11 @@
 #endif
 
 // Console logger outputs all allowed information to console using plot ColorConsoleAppender
-// #define TDLPP_ENABLE_CONSOLE_LOGGING
 #if defined(TDLPP_ENABLE_CONSOLE_LOGGING) || defined(TDLPP_CONSOLE_LOGGING_LEVEL)
     #if !defined(TDLPP_CONSOLE_LOGGING_LEVEL) && defined(TDLPP_LOGGING_LEVEL_COMMON)
         #define TDLPP_CONSOLE_LOGGING_LEVEL TDLPP_LOGGING_LEVEL_COMMON
     #elif !defined(TDLPP_CONSOLE_LOGGING_LEVEL)
-        #define TDLPP_CONSOLE_LOGGING_LEVEL 4
+        #define TDLPP_CONSOLE_LOGGING_LEVEL 3
     #endif
 
     #if !defined(TDLPP_ENABLE_CONSOLE_LOGGING)
