@@ -229,7 +229,7 @@ void tdlpp::auth::DefaultAuth::OnAuthStateWaitParametres() {
     TDLPP_LOG_DEBUG(" ");
 
     if (tdApiId <= 0) {
-        TDLPP_LOG_WARNING("You can genara api id and hash on 'https://my.telegram.org'");
+        printf("You can generate api id and hash on 'https://my.telegram.org'\n");
         tdApiId = std::stoi(utils::getpass("  Enter api id: "));
         tdApiHash = utils::getpass("  Enter api hash: ");
     }
