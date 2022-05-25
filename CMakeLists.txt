@@ -123,6 +123,13 @@ if (MSVC)
   # target_compile_options(${PROJECT_NAME} PRIVATE -Wa,-mbig-obj)
 endif ()
 
+
+###################################################################################################
+## Tdlib id to name binding generator
+
+add_executable(binding_gen external/NameBindingGenerator/BindingGen.cpp)
+target_link_libraries(binding_gen stdc++fs)
+
 ###################################################################################################
 ## Samples
 
