@@ -25,6 +25,10 @@ option(TDLPP_BUILD_OPENSSL      "Build openssl from sources" ON)
 option(TDLPP_BUILD_ZLIB         "Build zlib from sources" ON)
 option(TDLPP_BUILD_GPERF        "Build gperf from sources" ON)
 
+option(TDLPP_ENABLE_CONSOLE_LOGGING         "Enables tdl++ console logging" ON)
+option(TDLPP_ENABLE_FILE_LOGGING            "Enables tdl++ file logging" ON)
+option(TDLPP_ENABLE_OBJECT_LOGGING          "Enables tdl++ logging of tdlib objects" OFF)
+
 ##################################################################################################################
 ## Set up build threads
 
@@ -62,6 +66,7 @@ execute_process(COMMAND
     -G ${CMAKE_GENERATOR}
     -S ${CMAKE_CURRENT_LIST_DIR}/external
     -B ${TDLPP_DEPS_BUILD_PATH}
+      -DCMAKE_BUILD_TYPE=Release
       -DTDLPP_BUILD_TDLIB=${TDLPP_BUILD_TDLIB}
       -DTDLPP_BUILD_OPENSSL=${TDLPP_BUILD_OPENSSL}
       -DTDLPP_BUILD_ZLIB=${TDLPP_BUILD_ZLIB}
@@ -102,7 +107,15 @@ add_library(${PROJECT_NAME} SHARED ${TDLPP_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC include PUBLIC ${TDLPP_DEPS_INSTALL_PATH}/plog/include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Td::TdStatic)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DTDLPP_ENABLE_CONSOLE_LOGGING)
+if (TDLPP_ENABLE_CONSOLE_LOGGING)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DTDLPP_ENABLE_CONSOLE_LOGGING)
+endif()
+if (TDLPP_ENABLE_FILE_LOGGING)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DTDLPP_ENABLE_FILE_LOGGING)
+endif()
+if (TDLPP_ENABLE_OBJECT_LOGGING)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DTDLPP_ENABLE_OBJECT_LOGGING)
+endif()
 
 if (MSVC)
   target_compile_definitions(${PROJECT_NAME} PRIVATE /bigobj)
