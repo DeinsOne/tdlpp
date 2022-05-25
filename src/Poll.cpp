@@ -27,7 +27,7 @@ std::shared_ptr<tdlpp::poll::PollManager> tdlpp::poll::PollManager::create(const
 tdlpp::poll::PollManager::PollManager(const std::shared_ptr<tdlpp::poll::LongPoll>& longPoll) : poll(longPoll), active(true), destroy(false) {
     TDLPP_LOG_VERBOSE("constructor");
     auto func = [&]() {
-        while (!destroy.load()) {
+        while (!destroy) {
             if (IsActive()) {
                 if (poll->handler_->auth_->HandleRetry()) {
                     if (poll->handler_->auth_->GetRetriesCount() >= TDLPP_MAX_AUTH_RETRIES) {
@@ -65,7 +65,7 @@ tdlpp::poll::PollManager::~PollManager() {
 
     std::mutex _mtx;
     std::unique_lock<std::mutex> lock(_mtx);
-    destroyLock.wait(lock, [&]() { return !destroy.load(); } );
+    destroyLock.wait(lock, [&]() { return !destroy; } );
     TDLPP_LOG_VERBOSE("distructor lock release");
 }
 
@@ -82,5 +82,5 @@ void tdlpp::poll::PollManager::Pause() {
 void tdlpp::poll::PollManager::handlingResponse(td::ClientManager::Response response) {
     if (!response.object) return;
     TDLPP_LOG_DEBUG(" ");
-    poll->handler_->Handle(response.request_id, std::move(response.object));
+    poll->handler_->PushToQueue(response.request_id, std::move(response.object));
 }

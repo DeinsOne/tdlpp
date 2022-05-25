@@ -5,7 +5,6 @@
 #include <tdlpp/poll/LongPoll.hpp>
 
 #include <condition_variable>
-#include <atomic>
 #include <thread>
 
 namespace tdlpp { namespace poll {
@@ -32,13 +31,13 @@ namespace tdlpp { namespace poll {
         void Pause();
 
         // Checking if the polling is active or not
-        bool IsActive() { return active.load(); }
+        bool IsActive() { return active; }
 
     private:
-        std::atomic<bool> active;
+        bool active;
         std::thread worker;
 
-        std::atomic<bool> destroy;
+        bool destroy;
         std::condition_variable destroyLock;
 
         std::shared_ptr<LongPoll> poll;

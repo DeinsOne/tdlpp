@@ -5,7 +5,6 @@
 #include <tdlpp/auth/IAuth.hpp>
 #include <condition_variable>
 #include <mutex>
-#include <atomic>
 
 namespace tdlpp { namespace auth {
 
@@ -51,7 +50,7 @@ namespace tdlpp { namespace auth {
         );
 
         // Check if the instance is authorized or not
-        virtual bool IsAuthorized() override { return authorized.load(); }
+        virtual bool IsAuthorized() override { return authorized; }
         // Wait for the authorization to complete, or for the maximum number of retries to be exceeded
         virtual void WaitAuthorized();
 
@@ -80,7 +79,7 @@ namespace tdlpp { namespace auth {
 
     private:
         std::uint64_t authQueryId{0};
-        std::atomic<bool> authorized{false};
+        bool authorized{false};
 
         std::int32_t tdApiId{-1};
         std::string tdApiHash;
@@ -89,7 +88,7 @@ namespace tdlpp { namespace auth {
         std::string applicationVersion;
         std::string applicationLanguageCode;
 
-        std::atomic<bool> retry{false};
+        bool retry{false};
         std::uint32_t retries{0};
 
         SharedObjectPtr<td::td_api::AuthorizationState> authState;

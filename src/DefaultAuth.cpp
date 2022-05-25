@@ -43,7 +43,7 @@ void tdlpp::auth::DefaultAuth::WaitAuthorized() {
     TDLPP_LOG_DEBUG("lock");
     std::mutex _mtx;
     std::unique_lock<std::mutex> lock(_mtx);
-    authLock.wait(lock, [&] { return authorized.load() || retries >= TDLPP_MAX_AUTH_RETRIES; });
+    authLock.wait(lock, [&] { return authorized || retries >= TDLPP_MAX_AUTH_RETRIES; });
     TDLPP_LOG_DEBUG("unlock");
 }
 
@@ -266,7 +266,7 @@ void tdlpp::auth::DefaultAuth::SetHandler(const std::shared_ptr<tdlpp::base::Tdl
 }
 
 bool tdlpp::auth::DefaultAuth::HandleRetry() {
-    if (retry.load()) {
+    if (retry) {
         handleUpdate();
         retry = false;
         authLock.notify_all();

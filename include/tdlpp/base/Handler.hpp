@@ -7,6 +7,8 @@
 #include <tdlpp/router/Router.hpp>
 #include <tdlpp/base/BindongHandler.hpp>
 #include <functional>
+#include <thread>
+#include <queue>
 
 namespace tdlpp { namespace poll {
     class LongPoll;
@@ -30,6 +32,8 @@ namespace tdlpp { namespace base {
 
     public:
         TdlppHandler(const std::shared_ptr<auth::IAuth>& auth__);
+
+        ~TdlppHandler();
 
         /**
          * @brief Set a callback for a specific td update
@@ -85,13 +89,28 @@ namespace tdlpp { namespace base {
         std::shared_ptr<UpdateCallbacksHandler> updatesHandler;
         std::shared_ptr<BindingHandler> binding;
 
+        std::thread worker;
+        std::mutex objectsQueueMutex;
+        std::condition_variable queueNotifier;
+        std::queue<std::pair<std::uint64_t,SharedObjectPtr<td::td_api::Object>>> objectsQueue;
+        bool destroy;
+        std::condition_variable destroyLock;
+
+        /**
+         * @brief Pushes object to processing queue
+         * 
+         * @param requestId Respons's request id 
+         * @param object Response object
+         */
+        void PushToQueue(const std::uint64_t& requestId, UniqueObjectPtr<td::td_api::Object> object);
+
         /**
          * @brief Handle incoming reponse
          * 
          * @param requestId Respons's request id 
          * @param object Response object
          */
-        void Handle(const std::uint64_t& requestId, UniqueObjectPtr<td::td_api::Object> object);
+        void Handle(const std::uint64_t& requestId, SharedObjectPtr<td::td_api::Object> object);
 
         void SetRouter(const std::shared_ptr<router::Router>& router__) { router_ = router__; }
 
