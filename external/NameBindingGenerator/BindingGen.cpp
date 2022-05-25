@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     if (argc == 2) {
         if (!strcmp(argv[1], "--help")) {
             printf("Usage:\n");
-            printf("  idnmbgen [INPUT HEADER PATH] [OUTPUT HEADER PATH]\n\n");
+            printf("  binding_gen [INPUT HEADER PATH] [OUTPUT HEADER PATH]\n\n");
             return 0;
         }
     }
