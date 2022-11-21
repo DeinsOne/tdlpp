@@ -11,8 +11,8 @@ int main(int argc, char** argv) {
     "sample-shared-tdlib"  // downloading dir
   );
 
-  auto handler = tdlpp::base::TdlppHandler::create(auth);
-  auto longPoll = tdlpp::poll::LongPoll::create(handler);
+  auto handler = tdlpp::base::TdlppHandler::create();
+  auto longPoll = tdlpp::poll::LongPoll::create(auth, handler);
 
 
   handler->SetCallback<td::td_api::updateNewMessage>(false, [&](td::td_api::updateNewMessage& update) {

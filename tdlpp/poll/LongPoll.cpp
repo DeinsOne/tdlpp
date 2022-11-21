@@ -1,16 +1,21 @@
 
 #include <tdlpp/poll/LongPoll.hpp>
 
-std::shared_ptr<tdlpp::poll::LongPoll> tdlpp::poll::LongPoll::create(const std::shared_ptr<tdlpp::base::TdlppHandler>& handler) {
-  auto poll = std::make_shared<tdlpp::poll::LongPoll>(handler);
+std::shared_ptr<tdlpp::poll::LongPoll> tdlpp::poll::LongPoll::create(const std::shared_ptr<auth::IAuth>& auth, const std::shared_ptr<tdlpp::base::TdlppHandler>& handler) {
+  auto poll = std::make_shared<tdlpp::poll::LongPoll>(auth, handler);
   poll->this_ = poll;
   return poll;
 }
 
-tdlpp::poll::LongPoll::LongPoll(const std::shared_ptr<tdlpp::base::TdlppHandler>& handler) : handler_(handler), running(true), destroy(false) {
+tdlpp::poll::LongPoll::LongPoll(const std::shared_ptr<auth::IAuth>& auth, const std::shared_ptr<tdlpp::base::TdlppHandler>& handler) : handler_(handler), running(true), destroy(false), auth_(auth) {
   TDLPP_LOG_VERBOSE("constructor");
   router_ = tdlpp::router::Router::create();
   handler_->SetRouter(router_);
+  auth_->SetHandler(handler_);
+
+  handler_->SetCallback<td::td_api::updateAuthorizationState>(true, [&](td::td_api::updateAuthorizationState& state) {
+    auth_->OnAuthStateUpdate(std::move(state));
+  });
 }
 
 tdlpp::poll::LongPoll::~LongPoll() {
@@ -42,8 +47,8 @@ void tdlpp::poll::LongPoll::ExecuteSync() {
     if (running) {
       // Check retries count inside the loop. This is oly applicable to auth update. Will drop
       // a poll once retries are exceed, otherwise will try to use the same action on last update
-      if (handler_->auth_->HandleRetry()) {
-        if (handler_->auth_->GetRetriesCount() >= TDLPP_MAX_AUTH_RETRIES) {
+      if (auth_->HandleRetry()) {
+        if (auth_->GetRetriesCount() >= TDLPP_MAX_AUTH_RETRIES) {
           TDLPP_LOG_FATAL("poll is paused because you have exceeded limit of authentication retries(%d)", TDLPP_MAX_AUTH_RETRIES);
           this->destroy = true;
           this->Pause();
@@ -52,7 +57,7 @@ void tdlpp::poll::LongPoll::ExecuteSync() {
       }
 
       // Handles state before authentication
-      else if (!handler_->auth_->IsAuthorized()) {
+      else if (!auth_->IsAuthorized()) {
         handlingResponse(router_->Receive(100));
       }
 

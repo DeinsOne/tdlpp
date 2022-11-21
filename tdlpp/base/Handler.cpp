@@ -1,21 +1,15 @@
 
 #include <tdlpp/base/Handler.hpp>
 
-std::shared_ptr<tdlpp::base::TdlppHandler> tdlpp::base::TdlppHandler::create(const std::shared_ptr<auth::IAuth>& auth_) {
-    auto handler = std::make_shared<tdlpp::base::TdlppHandler>(auth_);
+std::shared_ptr<tdlpp::base::TdlppHandler> tdlpp::base::TdlppHandler::create() {
+    auto handler = std::make_shared<tdlpp::base::TdlppHandler>();
     handler->this_ = handler;
-    handler->auth_->SetHandler(handler);
     return handler;
 }
 
-tdlpp::base::TdlppHandler::TdlppHandler(const std::shared_ptr<auth::IAuth>& auth__) : auth_(auth__), destroy(false) {
+tdlpp::base::TdlppHandler::TdlppHandler() : destroy(false) {
     TDLPP_LOG_VERBOSE("tdlpp::base::TdlppHandler::constructor");
     updatesHandler = UpdateCallbacksHandler::create();
-    // binding = BindingHandler::create();
-
-    SetCallback<td::td_api::updateAuthorizationState>(true, [&](td::td_api::updateAuthorizationState& state) {
-        auth_->OnAuthStateUpdate(std::move(state));
-    });
 
     auto func = [&]() {
         TDLPP_LOG_DEBUG("Create worker thread %d", std::this_thread::get_id());

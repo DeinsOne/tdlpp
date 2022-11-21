@@ -24,16 +24,17 @@ namespace tdlpp { namespace base {
     // Controles processing of incoming responses
     class TdlppHandler : public TdlppBase {
         friend poll::LongPoll;
+
     public:
         /**
          * @brief A factory method
          * 
          * @return std::shared_ptr<TdlppHandler> New instance of 'TdlppHandler'
          */
-        static std::shared_ptr<TdlppHandler> create(const std::shared_ptr<auth::IAuth>& auth_);
+        static std::shared_ptr<TdlppHandler> create();
 
     public:
-        TdlppHandler(const std::shared_ptr<auth::IAuth>& auth__);
+        TdlppHandler();
 
         ~TdlppHandler();
 
@@ -112,11 +113,8 @@ namespace tdlpp { namespace base {
 
     private:
         std::shared_ptr<TdlppHandler> this_;
-        std::shared_ptr<auth::IAuth> auth_;
-
         std::shared_ptr<router::Router> router_;
         std::shared_ptr<UpdateCallbacksHandler> updatesHandler;
-        // std::shared_ptr<BindingHandler> binding;
 
         std::thread worker;
 

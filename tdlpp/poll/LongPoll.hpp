@@ -16,10 +16,10 @@ namespace tdlpp { namespace poll {
          * 
          * @return std::shared_ptr<LongPoll> New instance of 'LongPoll'
          */
-        static std::shared_ptr<LongPoll> create(const std::shared_ptr<base::TdlppHandler>& handler);
+        static std::shared_ptr<LongPoll> create(const std::shared_ptr<auth::IAuth>& auth, const std::shared_ptr<base::TdlppHandler>& handler);
 
     public:
-        LongPoll(const std::shared_ptr<base::TdlppHandler>& handler);
+        LongPoll(const std::shared_ptr<auth::IAuth>& auth, const std::shared_ptr<base::TdlppHandler>& handler);
         ~LongPoll();
 
         /**
@@ -41,6 +41,7 @@ namespace tdlpp { namespace poll {
         std::shared_ptr<poll::LongPoll> this_;
         std::shared_ptr<router::Router> router_;
         std::shared_ptr<base::TdlppHandler> handler_;
+        std::shared_ptr<auth::IAuth> auth_;
 
         bool running;
         bool destroy;

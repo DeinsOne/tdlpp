@@ -17,7 +17,6 @@ namespace tdlpp { namespace auth {
 
     // An interface for the authorization process
     class IAuth {
-        friend base::TdlppHandler;
         friend poll::LongPoll;
 
     public:
