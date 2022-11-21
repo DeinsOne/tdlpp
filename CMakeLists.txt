@@ -45,23 +45,7 @@ add_library(${CMAKE_PROJECT_NAME}
 add_dependencies(${CMAKE_PROJECT_NAME} binding_generator binding_generator_header)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR} ./)
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${ZLIB_LIBRARIES})
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC Td::TdStatic plog::plog)
-
-
-target_compile_definitions(${CMAKE_PROJECT_NAME}
-  ## Enable tdlpp file logging
-  PRIVATE -DTDLPP_ENABLE_FILE_LOGGING
-
-  ## Define INFO file logging level
-  PRIVATE -DTDLPP_FILE_LOGGING_LEVEL=5
-
-  ## Enable td objects capturing 
-  PRIVATE -DTDLPP_ENABLE_OBJECT_LOGGING
-
-  ## TODO: Remove object logging from release build. Defines 8mb objects log file
-  PRIVATE -DTDLPP_OBJECT_LOGGING_MAX_FILE_SIZE=8388608
-)
 
 
 ##################################################################################################################
