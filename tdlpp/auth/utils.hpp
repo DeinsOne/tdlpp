@@ -24,6 +24,7 @@ namespace tdlpp { namespace utils {
         std::string password;
         unsigned char ch = 0;
         std::cout << prompt;
+        std::cout << prompt;
         DWORD con_mode;
         DWORD dwRead;
         HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -44,6 +45,7 @@ namespace tdlpp { namespace utils {
             }
         }
         std::cout << std::endl;
+        SetConsoleMode(hIn, con_mode | ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
         SetConsoleMode(hIn, con_mode | ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
         return password;
     }

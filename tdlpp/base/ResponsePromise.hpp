@@ -59,10 +59,12 @@ namespace tdlpp { namespace base {
     public:
         ResponsePromise(const std::uint64_t& requestId) : rid(requestId) {
             TDLPP_LOG_VERBOSE("constructor");
+            TDLPP_LOG_VERBOSE("constructor");
         }
         ResponsePromise(const std::uint64_t& requestId, const std::function<void(SharedObjectPtr<td::td_api::Object>)>& callback_)
             : rid(requestId), callback(callback_) 
         {
+            TDLPP_LOG_VERBOSE("constructor");
             TDLPP_LOG_VERBOSE("constructor");
         }
 
@@ -72,14 +74,17 @@ namespace tdlpp { namespace base {
         virtual std::shared_ptr<td::td_api::Object> GetResponse() override {
             if (response) return response;
             TDLPP_LOG_DEBUG("rid:%ld lock, wait response", rid);
+            TDLPP_LOG_DEBUG("rid:%ld lock, wait response", rid);
             std::mutex _mtx;
             std::unique_lock<std::mutex> ulock(_mtx);
             lock.wait(ulock, [&] { return response != nullptr; });
+            TDLPP_LOG_DEBUG("rid:%ld unlock", rid);
             TDLPP_LOG_DEBUG("rid:%ld unlock", rid);
             return response;
         }
 
         virtual void SetResponse(SharedObjectPtr<td::td_api::Object> response_) override {
+            TDLPP_LOG_DEBUG("rid:%ld %s", rid, TDLPP_TD_ID_NAME(response_->get_id()));
             TDLPP_LOG_DEBUG("rid:%ld %s", rid, TDLPP_TD_ID_NAME(response_->get_id()));
             response = response_;
             lock.notify_all();
