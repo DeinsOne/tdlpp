@@ -36,7 +36,7 @@ add_library(${CMAKE_PROJECT_NAME}
   tdlpp/tdlpp.hpp
   tdlpp/auth/DefaultAuth.cpp
   tdlpp/router/Router.cpp
-  tdlpp/poll/Poll.cpp
+  tdlpp/poll/LongPoll.cpp
   tdlpp/base/Handler.cpp
   tdlpp/base/UpdateCalbacksHandler.cpp
   ${TDLPP_BINDING_HEADER}

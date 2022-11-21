@@ -17,11 +17,11 @@ auto auth = tdlpp::auth::DefaultAuth::create(API_CREDENTIALS);
 // Handler object is responsible for executing update callbacks. Using instance of
 // the object you can run tdlib functions synchronously or asynchronously. All the
 // callbacks are executed in different from poll thread
-auto handler = tdlpp::base::TdlppHandler::create(auth);
+auto handler = tdlpp::base::TdlppHandler::create();
 
 // Longpoll is responsible for td api i/o operations. Receives and sends data in
 // different from executor thread and forwards it to handler for further processing
-auto poll = tdlpp::poll::LongPoll::create(handler);
+auto poll = tdlpp::poll::LongPoll::create(auth, handler);
 
 
 /* Define update callbacks here(actually you can do it anywhere, even on poll runtime) */
@@ -101,5 +101,10 @@ For building library there is some options for cmake
 | DEBUG     | 5     |
 | VERBOSE   | 6     |
 
+
 ## Advanced
+
+This section covers in all the details underlying concepts of tdlpp...
+
+### Concurrency
 
