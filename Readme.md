@@ -104,7 +104,66 @@ For building library there is some options for cmake
 
 ## Advanced
 
-This section covers in all the details underlying concepts of tdlpp...
+This section covers some useful tips on how to work with the library
 
-### Concurrency
+### Queries sync
 
+To make any kind of telegram request you have to use Handler object, it provides a few useful functions that can be invoked from elsewhere, from update callbacks and nested in other queries as well. The most flexible and stable way of querying is to use following code snap:
+
+```c++
+// Execute command and wait for response
+std::shared_ptr<td::td_api::Object> userObject = handler->ExecuteSync<td::td_api::getUser>(userId);
+
+// Cast object, execute callback with appropriate type function
+td::td_api::downcast_call(*userObject, tdlpp::overload(
+  [&](td::td_api::user& user) { ... },
+  [&](td::td_api::error& error) { ... },
+  [&](any&) {}
+));
+```
+
+To avoid that massive code construction there is another methods however, less reliable because they can cause exceptions in case of wrong type casting:
+
+```c++
+std::shared_ptr<td::td_api::Object> userObject = handler->ExecuteSync<td::td_api::getUser>(userId);
+
+// Cast telegram object. You must be 100% sure that object is of correct type, or wrap code with 'try' expression
+// cause bed type cast will throw an exception 
+std::shared_ptr<td::td_api::user> user = tdlpp::cast_object<td::td_api::user>(userObject);
+  ...
+```
+
+Or there is one line function call to do the same:
+
+```c++
+std::shared_ptr<td::td_api::user> user = handler->ExecuteSync<td::td_api::getUser, td::td_api::user>(userId);
+```
+
+
+### Queries async
+
+Apart from calls blocking executing thread there is way to call callback once response arrives:
+
+```c++
+auto getUser = td::td_api::make_object<td::td_api::getUser>(userId);
+
+// Will cal the callback once response is received, will continue execution flow
+handler->ExecuteAsync(std::move(getUser), [&](SharedObjectPtr<td::td_api::Object> object) {
+  ...
+});
+```
+
+There is another async mechanism for response lazy loading based on promises system:
+
+```c++
+auto getUser = td::td_api::make_object<td::td_api::getUser>(userId);
+auto userPromise = handler->ExecuteAsync(std::move(getUser));
+
+/* do some staff when waiting for response */
+
+// Will block execution flow if response haven't arrived
+auto userObject = userPromise->GetResponse();
+std::shared_ptr<td::td_api::user> user = tdlpp::cast_object<td::td_api::user>(userObject);
+
+printf("Lazy loaded user -> rid: %ld  username: %s", userPromise->GetRID(), user->usernames_->active_usernames_.at(0).c_str());
+```
