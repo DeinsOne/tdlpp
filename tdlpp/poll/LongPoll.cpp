@@ -58,22 +58,19 @@ void tdlpp::poll::LongPoll::ExecuteSync() {
 
       // Handles state before authentication
       else if (!auth_->IsAuthorized()) {
-        handlingResponse(router_->Receive(100));
+        handlingResponse(router_->Receive(2));
       }
 
       // Handles updates on authorized state. Will deal with multiple updates at one time, or if
       //there is no more will cause poll to wait timeout before processing new updates
       else {
         while (running) {
-          auto response = router_->Receive(0);
+          auto response = router_->Receive(100);
           if (response.object) handlingResponse(std::move(response));
           else break;
         }
       }
     }
-
-    // Implicit loop timeout
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 
